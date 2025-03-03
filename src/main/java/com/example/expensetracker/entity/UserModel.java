@@ -19,6 +19,7 @@ public class UserModel {
     @NotNull(message = "Please Enter Password")
     @Size(min = 5,message = "Password must be at least 5 characters")
     private String password;
+    
     private Long age = 0L;
 
     public String getName() {

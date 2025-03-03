@@ -15,10 +15,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/register")
-    public ResponseEntity<User> save(@Valid @RequestBody UserModel user) {
-        return new ResponseEntity<User>(userService.createUser(user), HttpStatus.CREATED);
-    }
 
     @GetMapping("/users/{userid}")
     public ResponseEntity<User> readUser(@PathVariable Long userid) {
