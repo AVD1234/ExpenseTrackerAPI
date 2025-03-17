@@ -1,6 +1,7 @@
 package com.example.expensetracker.Service;
 
 import com.example.expensetracker.Repository.ExpenseRepository;
+
 import com.example.expensetracker.entity.Expense;
 import com.example.expensetracker.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +20,17 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Autowired
     private ExpenseRepository expenseRepository;
 
+    @Autowired
+    private UserService userService;
+
     @Override
     public Page<Expense> getAllExpenses(Pageable page) {
-        return expenseRepository.findAll(page);
+        return expenseRepository.findByUserId(userService.getLoggedInUser().getId(),page);
     }
 
     @Override
     public Expense getExpenseById(Long expenseId) {
-        Optional<Expense> expense = expenseRepository.findById(expenseId);
+        Optional<Expense> expense = expenseRepository.findByUserIdAndId(userService.getLoggedInUser().getId(),expenseId);
         if (expense.isPresent()) {
             return expense.get();
         }
@@ -36,12 +40,13 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public void deleteExpenseById(Long expenseId) {
-        Expense expense=getExpenseById(expenseId);
+        Expense expense = getExpenseById(expenseId);
         expenseRepository.delete(expense);
     }
 
     @Override
     public Expense saveExpense(Expense expense) {
+        expense.setUser(userService.getLoggedInUser());
         return expenseRepository.save(expense);
     }
 
@@ -57,12 +62,12 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public List<Expense> readByCategory(String category, Pageable page) {
-        return expenseRepository.findByCategory(category, page).toList();
+        return expenseRepository.findByUserIdAndCategory(userService.getLoggedInUser().getId(),category, page).toList();
     }
 
     @Override
     public List<Expense> readByName(String keyword, Pageable page) {
-        return expenseRepository.findByNameContaining(keyword, page).toList();
+        return expenseRepository.findByUserIdAndNameContaining(userService.getLoggedInUser().getId(),keyword, page).toList();
     }
 
     @Override
@@ -75,7 +80,7 @@ public class ExpenseServiceImpl implements ExpenseService {
             endDate = new Date(System.currentTimeMillis());
         }
 
-        return expenseRepository.findByDateBetween(startDate, endDate, page).toList();
+        return expenseRepository.findByUserIdAndDateBetween(userService.getLoggedInUser().getId(),startDate, endDate, page).toList();
 
     }
 
